@@ -1,15 +1,5 @@
 #!usr/bin/python3
-import sys
 import subprocess
-
-# Import local tools
-sys.path.append("/kiwi/bin/kiwistriker/modules/exploit")
-sys.path.append("/kiwi/bin/kiwistriker/modules/recon")
-sys.path.append("/kiwi/bin/kiwistriker/modules/utility")
-
-import bruteclaw, xpoverflow
-import networkmap, portscanner
-import encrypt
 
 ansiGreen = "\x1b[32m"
 ansiBlue = "\x1b[34m"
