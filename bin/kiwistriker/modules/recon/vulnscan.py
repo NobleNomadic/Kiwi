@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from impacket.dcerpc.v5 import transport
 import impacket.uuid as impuuid
 import sys

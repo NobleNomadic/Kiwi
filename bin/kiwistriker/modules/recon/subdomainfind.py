@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import dns.resolver
 import random
 import sys
