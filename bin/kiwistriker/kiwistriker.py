@@ -34,7 +34,7 @@ def processCommand(commandString):
 	if len(tokenList) == 0:
 		return
 
-	elif tokenList[1] == "exit":
+	elif tokenList[0] == "exit":
 		subprocess.run("clear")
 		exit(0)
 
