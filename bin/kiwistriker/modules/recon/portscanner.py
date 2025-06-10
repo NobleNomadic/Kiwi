@@ -2,6 +2,7 @@
 import socket
 import random
 import sys
+import time
 
 def checkPort(targetIP, port):
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -12,7 +13,7 @@ def checkPort(targetIP, port):
 
 	if result == 0:
 		print(f"[+] Port {port} is open")
-		return True		
+		return True
 	return False
 
 def scanIP(targetIP, portList):
@@ -27,7 +28,13 @@ def scanIP(targetIP, portList):
 		if portOpen:
 			targetOpenPorts.append(port)
 
-	return targetOpenPorts
+	returnData = {
+		"ip": targetIP,
+		"time": time.now().isoformat(),
+		"ports": targetOpenPorts
+	}
+
+	return returnData
 
 if __name__ == "__main__":
 	scanIP("127.0.0.1", list(range(65535)))

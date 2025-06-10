@@ -23,7 +23,7 @@ def findSubdomains(targetDomain, wordlistPath):
             for ip in answers:
                 print(f"[+] {fullDomain:<20} -> {ip}")
                 # Store the output in an array of objects
-                foundDomains.append({"domain": fullDomain, "IP": ip})
+                foundDomains.append({"domain": fullDomain, "ip": ip})
 
         except dns.resolver.NXDOMAIN:
             pass
@@ -35,6 +35,11 @@ def findSubdomains(targetDomain, wordlistPath):
             print(f"[-] Error on {fullDomain}: {error}")
 
     print(f"[*] Found {len(foundDomains)} subdomains")
+
+    returnData = {
+        "url": targetDomain,
+        "found": foundDomains
+    }
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

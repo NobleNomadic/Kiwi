@@ -28,6 +28,9 @@ You can run some modules and various parts directly, but if you want the simples
 
 ## Contents of Kiwi
 
+### Bin Folder
+This is the folder where all tools are stored along with their source code. You can add your own tool in a new folder inside bin.
+
 ### Kiwi Striker
 
 Kiwi Striker is a multitool that contains tools for penetration testing within a single place.  

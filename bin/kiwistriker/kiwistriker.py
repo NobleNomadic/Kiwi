@@ -25,7 +25,7 @@ RECON            EXPLOIT       UTILITY
 [vulnscan   ]   [bruteclaw ]   [sshclient ]
 [netmonitor ]   [shellshock]   [ftpclient ]
 [dirbuster  ]   [          ]   [          ]
-[subdomains ]   [          ]   [          ]"""
+[subdomain  ]   [          ]   [          ]"""
 
 
 def processCommand(commandString):
