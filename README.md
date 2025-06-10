@@ -74,11 +74,11 @@ If you want to store custom server rules files, or other data which will change,
 The `etc` folder contains configuration files for all parts of Kiwi.
 
 ### Log
-The `log` folder is used for storing logs and the results of all programs.  
+The `log` folder is used for storing logs and the results of all programs.
 Be careful changing anything in this folder, as most programs in Kiwi expect certain files to have a specific structure already defined.
+If this repository has added example logs, you should remove the logs, but keep the main array containing all logs.
 
 ## Final Note
-
 Kiwi is meant to be customized. I have tried to keep the codebase as simple as possible so that anybody with an understanding of Python can make their own changes directly to the code.  
 Also note that Kiwi is designed for Linux only. Some parts may work on Windows, but it is recommended that you use Linux.
 
