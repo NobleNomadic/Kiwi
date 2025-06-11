@@ -1,5 +1,16 @@
-#!usr/bin/python3
+#!/usr/bin/env python3
 import subprocess
+import sys
+
+# Add local paths
+# If you didn't clone kiwi into a root, change this path
+sys.path.append("/kiwi/bin/kiwistriker/modules/exploit")
+sys.path.append("/kiwi/bin/kiwistriker/modules/recon")
+sys.path.append("/kiwi/bin/kiwistriker/modules/utility")
+
+import bruteclaw, shellshock, xpoverflow
+import dirbuster, netmonitor, portscanner, subdomainfind, vulnscan
+import encrypt, ftpclient, sshclient
 
 ansiGreen = "\x1b[32m"
 ansiBlue = "\x1b[34m"
@@ -30,13 +41,89 @@ RECON            EXPLOIT       UTILITY
 
 def processCommand(commandString):
 	tokenList = commandString.lower().split(" ")
+	bufferData = None	# Buffer used to store the return data of commands
 
 	if len(tokenList) == 0:
 		return
 
+	# Admin commands
 	elif tokenList[0] == "exit":
 		subprocess.run("clear")
 		exit(0)
+
+	# Vulnscan
+	elif len(tokenList) == 3 and tokenList[0] == "vulnscan":
+		if tokenList[1] == "xpoverflow":
+			bufferData = vulnscan.checkXPOverflow(tokenList[2])
+	
+	# Portscanner
+	elif len(tokenList) == 3 and tokenList[0] == "portscanner":
+		targetIP= tokenList[1]
+		portArgument = tokenList[2]
+		portList = []
+
+		if portArgument == "common":
+			portList = [21, 22, 53, 80, 135, 139, 443, 445, 2222, 8080, 8433]
+
+		elif portArgument == "vuln":
+			portList = [21, 22, 23, 445]
+
+		elif portArgument == "router":
+			portList = [53, 80, 8080, 443, 8443, 445]
+
+		elif portArgument == "server":
+			portList = [3306, 5432, 1521, 1433, 21, 22]
+
+		elif portArgument == "custom":
+			try:
+				customPorts = input("[>] Enter list of ports: ")
+				portList = customPorts.split(" ")
+
+			except:
+				print("[-] Enter a valid list")
+				return None
+
+		try:
+			bufferData = portscanner.scanIP(targetIP, portList)
+
+		except Exception as e:
+			print(f"[-] Error: {e}")
+
+	# Directory buster
+	elif len(tokenList) == 3 and tokenList[0] == "dirbuster":
+		url = tokenList[1]
+		wordlistPath = tokenList[2]
+
+		bufferData = dirbuster.findDirectories(url, wordlistPath)
+
+	
+	# Subdomain finder
+	elif len(tokenList) == 3 and tokenList[0] == "subdomain":
+		targetDomain = tokenList[1]
+		wordlistPath = tokenList[2]
+
+		bufferData = subdomainfind.findSubdomains(targetDomain, wordlistPath)
+
+
+	# Network monitor
+	elif len(tokenList) == 2 and tokenList[0] == "netmonitor":
+		count = tokenList[1]
+
+		try:
+			netmonitor.sniffNetwork(int(count))
+		except Exception as e:
+			print(f"[-] Error: {e}")
+
+	# Network monitor with filters
+	elif len(tokenList) >= 3 and tokenList[0] == "netmonitor":
+		count = tokenList[1]
+		filter = " ".join(tokenList[2:])
+
+		try:
+			netmonitor.sniffNetwork(int(count), filter)
+		except Exception as e:
+			print(f"[-] Error: {e}")
+
 
 
 def mainCLI():

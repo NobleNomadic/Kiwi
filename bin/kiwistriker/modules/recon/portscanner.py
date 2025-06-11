@@ -2,7 +2,7 @@
 import socket
 import random
 import sys
-import time
+import datetime
 
 def checkPort(targetIP, port):
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -30,7 +30,7 @@ def scanIP(targetIP, portList):
 
 	returnData = {
 		"ip": targetIP,
-		"time": time.now().isoformat(),
+		"time": datetime.datetime.now().isoformat(),
 		"ports": targetOpenPorts
 	}
 

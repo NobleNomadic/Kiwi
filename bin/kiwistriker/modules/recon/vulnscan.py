@@ -22,12 +22,23 @@ def checkXPOverflow(targetIP):
         print("[+] Target is likely vulnerable")
 
         dce.disconnect()
-        return True
+        
+        returnData = {
+            "ip": targetIP,
+            "xpoverflowvuln": True
+        }
+        return returnData
 
     except Exception as e:
         print("[-] Target is likely patched or not vulnerable")
         print(f"[-] Error: {str(e)}")
-        return False
+        
+        returnData = {
+            "ip": targetIP,
+            "xpoverflowvuln": False
+        }
+
+        return returnData
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

@@ -1,5 +1,5 @@
 # Kiwi
-Kiwi is a cybersecurity toolset containing simple Python tools for penetration testing on Linux.  
+Kiwi is a cybersecurity toolset containing simple Python tools for penetration testing on Linux.
 **Please do not use these tools for illegal or unethical purposes.**
 
 ## Dependencies
@@ -13,13 +13,14 @@ To make sure all code runs properly, make sure the following is installed:
   - `dnspython`
 
 ## Using Kiwi
-Kiwi is designed to be cloned into a local system and customized.  
+Kiwi is designed to be cloned into the root directory system and customized.
+It is important that this done to make sure that the local imports work. Currently, kiwi striker will import from /kiwi/bin/kiwistriker/modules, and cloning the repo into another directory won't work unless you modify the import paths in kiwi striker  
 You can run some modules and various parts directly, but if you want the simplest experience, run one of the following:
 
 - ```bash
   python3 kiwi/bin/kiwistriker/kiwistriker.py
   ```
-  for Kiwi Striker penetration testing multitool
+  for Kiwi Striker penetration testing multitool, or use
 
 - ```bash
   python3 kiwi/bin/netkiwi/netkiwi.py
@@ -83,7 +84,6 @@ If this repository has added example logs, you should remove the logs, but keep 
 
 ## Final Note
 Kiwi is meant to be customized. I have tried to keep the codebase as simple as possible so that anybody with an understanding of Python can make their own changes directly to the code.  
-Also note that Kiwi is designed for Linux only. Some parts may work on Windows, but it is recommended that you use Linux.
-
+Also note that Kiwi is designed for Linux only. You may be able to get some parts may work on Windows, but it most of kiwi is made with Windows in mind.
 If you are interested in contributing to Kiwi, I would recommend you wait until I get it to a minimal working state, which could be a few weeks from when you're reading this.  
 By then, a proper structure for adding new modules and programs to Kiwi should be in place.

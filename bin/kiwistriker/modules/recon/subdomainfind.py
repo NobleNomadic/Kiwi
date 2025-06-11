@@ -21,9 +21,9 @@ def findSubdomains(targetDomain, wordlistPath):
         try:
             answers = dnsResolver.resolve(fullDomain, "A")
             for ip in answers:
-                print(f"[+] {fullDomain:<20} -> {ip}")
+                print(f"[+] {fullDomain:<30} -> {ip}")
                 # Store the output in an array of objects
-                foundDomains.append({"domain": fullDomain, "ip": ip})
+                foundDomains.append({"domain": fullDomain, "ip": str(ip)})
 
         except dns.resolver.NXDOMAIN:
             pass
@@ -40,9 +40,11 @@ def findSubdomains(targetDomain, wordlistPath):
         "url": targetDomain,
         "found": foundDomains
     }
+    return returnData
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python3 subdomainfind.py <domain>")
-    
-    findSubdomains(sys.argv[1], "/kiwi/share/wordlists/subdomains.txt")
+        sys.exit(1)
+
+    result = findSubdomains(sys.argv[1], "/kiwi/share/wordlists/subdomains.txt")
