@@ -43,8 +43,8 @@ def findSubdomains(targetDomain, wordlistPath):
     return returnData
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python3 subdomainfind.py <domain>")
+    if len(sys.argv) != 3:
+        print("Usage: python3 subdomainfind.py <domain> <wordlist>")
         sys.exit(1)
 
-    result = findSubdomains(sys.argv[1], "/kiwi/share/wordlists/subdomains.txt")
+    result = findSubdomains(sys.argv[1], sys.argv[2])
