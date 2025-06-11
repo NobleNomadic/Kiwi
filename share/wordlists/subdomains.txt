@@ -21,3 +21,16 @@ login
 info
 register
 ftp
+store
+shop
+app
+support
+contact
+access
+faq
+firewall
+share
+gateway
+home
+prod
+production
