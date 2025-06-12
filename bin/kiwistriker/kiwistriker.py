@@ -10,7 +10,7 @@ sys.path.append("/kiwi/bin/kiwistriker/modules/utility")
 
 import bruteclaw, shellshock, xpoverflow
 import dirbuster, netmonitor, portscanner, subdomainfind, vulnscan
-import encrypt, ftpclient, sshclient
+import dnstool, encrypt, ftpclient, sshclient
 
 ansiGreen = "\x1b[32m"
 ansiBlue = "\x1b[34m"
@@ -35,8 +35,8 @@ RECON            EXPLOIT       UTILITY
 [portscanner]   [xpoverflow]   [encrypt   ]
 [vulnscan   ]   [bruteclaw ]   [sshclient ]
 [netmonitor ]   [shellshock]   [ftpclient ]
-[dirbuster  ]   [          ]   [dnsresolve]
-[subdomain  ]   [          ]   [reversedns]"""
+[dirbuster  ]   [          ]   [dnstool   ]
+[subdomain  ]   [          ]   [          ]"""
 
 
 def processCommand(commandString):
@@ -124,6 +124,20 @@ def processCommand(commandString):
 		except Exception as e:
 			print(f"[-] Error: {e}")
 
+	# DNS utility
+	elif len(tokenList) == 3 and tokenList[0] == "dnstool":
+		target = tokenList[1]
+		flag = tokenList[2]
+
+		bufferData = dnstool.DNSTool(target, flag)
+
+	# Encryption utility
+	elif len(tokenList) == 4 and tokenList[0] == "encrypt":
+		inFilename = tokenList[1]
+		outFilename = tokenList[2]
+		key = tokenList[3]
+
+		encrypt.xorFile(inFilename, outFilename, key)
 
 
 def mainCLI():

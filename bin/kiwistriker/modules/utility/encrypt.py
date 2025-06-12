@@ -12,11 +12,7 @@ def xorFile(infile, outfile, key):
     encrypted = xorData(data, keyBytes)
     with open(outfile, 'wb') as f:
         f.write(encrypted)
-    print(f"[+] File encrypted and saved to {outfile}")
-
-def decryptFile(infile, outfile, key):
-    encryptFile(infile, outfile, key)
-    print(f"[+] File decrypted and saved to {outfile}")
+    print(f"[+] File data XORed and saved to {outfile}")
 
 
 if __name__ == "__main__":
