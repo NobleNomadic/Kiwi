@@ -139,6 +139,23 @@ def processCommand(commandString):
 
 		encrypt.xorFile(inFilename, outFilename, key)
 
+	# FTP client utility
+	elif len(tokenList) == 4 and tokenList[0] == "ftp":
+		targetIP = tokenList[1]
+		username = tokenList[2]
+		password = tokenList[3]
+		
+		ftpclient.FTPClientLoop(targetIP, username, password)
+
+
+	# Shellshock exploit
+	elif len(tokenList) >= 4 and tokenList[0] == "shellshock":
+		target = tokenList[1]
+		CGIPath = tokenList[2]
+		bashCode = tokenList[3:]
+
+		shellshock.shellshockAttack(target, CGIPath, bashCode)
+
 
 def mainCLI():
 	subprocess.run("clear")
