@@ -35,8 +35,8 @@ RECON            EXPLOIT       UTILITY
 [portscanner]   [xpoverflow]   [encrypt   ]
 [vulnscan   ]   [bruteclaw ]   [sshclient ]
 [netmonitor ]   [shellshock]   [ftpclient ]
-[dirbuster  ]   [          ]   [          ]
-[subdomain  ]   [          ]   [          ]"""
+[dirbuster  ]   [          ]   [dnsresolve]
+[subdomain  ]   [          ]   [reversedns]"""
 
 
 def processCommand(commandString):
