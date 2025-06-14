@@ -19,8 +19,14 @@ def connectSSH(targetIP, username, password):
 
 # Run a standard shell command
 def runSSHCommand(ssh, command):
+	print(f"[*] Executing '{command}'")
+
 	try:
 		stdin, stdout, stderr = ssh.exec_command(command)
+
+		# Wait for command to complete
+		exitStatus = stdout.channel.recv_exit_status()
+
 		output = stdout.read().decode()
 		error = stderr.read().decode()
 

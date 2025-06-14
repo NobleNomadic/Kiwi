@@ -170,6 +170,15 @@ def processCommand(commandString):
 
 		shellshock.shellshockAttack(target, CGIPath, bashCode)
 
+	# Bruteclaw password bruteforcer
+	elif len(tokenList) == 5 and tokenList[0] == "bruteclaw":
+		targetIP = tokenList[1]
+		usernameFilename = tokenList[2]
+		passwordFilename = tokenList[3]
+		service = tokenList[4]
+
+		bruteclaw.bruteForce(targetIP, usernameFilename, passwordFilename, service)
+
 
 def mainCLI():
 	subprocess.run("clear")
