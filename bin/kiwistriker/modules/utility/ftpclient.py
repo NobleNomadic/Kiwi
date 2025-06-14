@@ -64,5 +64,6 @@ def FTPClientLoop(targetIP, username, password):
         elif tokenList[0] == "list":
             FTPList(ftp)
 
+    print("[*] Exiting FTP")
     ftp.quit()
     return

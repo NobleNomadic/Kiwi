@@ -12,5 +12,19 @@ def connectSSH(targetIP, username, password):
 
 	except Exception as e:
 		print(f"[-] Error: {e}")
+		return None
 
-def sshClientLoop(targetIP, username, password)
+def SSHClientLoop(targetIP, username, password):
+	ssh = connectSSH(targetIP, username, password)
+
+	if ssh == None:
+		return
+
+	while True:
+		command = input(f"SSH@{targetIP}")
+		if command.lower() == "exit":
+			break
+
+	print("[*] Exiting SSH")
+	ssh.close()
+	return
