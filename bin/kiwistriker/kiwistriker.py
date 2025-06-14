@@ -43,13 +43,19 @@ def processCommand(commandString):
 	tokenList = commandString.lower().split(" ")
 	bufferData = None	# Buffer used to store the return data of commands
 
+	# Return on empty command
 	if len(tokenList) == 0:
 		return
 
-	# Admin commands
+	# Admin commands for managing kiwi striker without interacting with modules
 	elif tokenList[0] == "exit":
 		subprocess.run("clear")
 		exit(0)
+
+	elif tokenList[0] == "clear" or tokenList[0] == "reset":
+		subprocess.run("clear")
+		print(ansiBlue + ansiBold + banner + ansiReset)
+		print(commands)
 
 	# Vulnscan
 	elif len(tokenList) == 3 and tokenList[0] == "vulnscan":
@@ -146,6 +152,14 @@ def processCommand(commandString):
 		password = tokenList[3]
 		
 		ftpclient.FTPClientLoop(targetIP, username, password)
+
+	# SSH client utility
+	elif len(tokenList) == 4 and tokenList[0] == "ssh":
+		targetIP = tokenList[1]
+		username = tokenList[2]
+		password = tokenList[3]
+
+		sshclient.SSHClientLoop(targetIP, username, password)
 
 
 	# Shellshock exploit
