@@ -51,7 +51,7 @@ def FTPClientLoop(targetIP, username, password):
         if command.lower() == "exit":
             break
 
-        tokenList = command.lower().split()
+        tokenList = command.split()
         if len(tokenList) == 0:
             continue
 

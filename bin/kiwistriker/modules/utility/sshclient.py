@@ -38,47 +38,21 @@ def runSSHCommand(ssh, command):
 	except Exception as e:
 		print(f"[-] Command execution failed: {e}")
 
-# Read local binary data, encode it into chunks, send to server, and decode to rebuild file
-def sendFileOverSSH(ssh, localFilePath, remoteFilePath, chunkSize=1024):
+def sendFileOverSSH(ssh, localFilePath, remoteFilePath):
 	try:
-		with open(localFilePath, "rb") as f:
-			fileData = f.read()
+		sftp = ssh.open_sftp()
 
-		b64Data = base64.b64encode(fileData).decode()
-		chunks = [b64Data[i:i+chunkSize] for i in range(0, len(b64Data), chunkSize)]
+		print(f"[*] Uploading '{localFilePath}' to '{remoteFilePath}'")
+		sftp.put(localFilePath, remoteFilePath)
 
-		# Clear remote file
-		ssh.exec_command(f"echo -n '' > {remoteFilePath}")
+		print("[+] File uploaded successfully.")
+		sftp.close()
 
-		for idx, chunk in enumerate(chunks):
-			# Escape single quotes for shell safety
-			safeChunk = chunk.replace("'", "'\"'\"'")
-			progress = round((idx + 1) / len(chunks) * 100, 2)
-			print(f"[+] Sending chunk {idx + 1}/{len(chunks)} ({progress}%)")
-
-			# Send chunk using printf for better portability
-			ssh.exec_command(f"printf '%s' '{safeChunk}' >> {remoteFilePath}")
-
-		print("[*] All chunks sent\n[*] Rebuilding file on remote target")
-
-		# Decode the file remotely
-		decodedFilePath = remoteFilePath.replace(".b64", "")
-		ssh.exec_command(f"base64 -d {remoteFilePath} > {decodedFilePath}")
-
-		print(f"[+] File rebuilt at {decodedFilePath}")
-
-		# Perform SHA256 integrity check
-		localHash = hashlib.sha256(fileData).hexdigest()
-		stdin, stdout, stderr = ssh.exec_command(f"sha256sum {decodedFilePath}")
-		remoteHash = stdout.read().decode().split()[0]
-
-		if localHash == remoteHash:
-			print("[+] File integrity verified successfully")
-		else:
-			print("[-] File integrity check failed")
-
+	except FileNotFoundError:
+		print(f"[-] Local file '{localFilePath}' not found.")
 	except Exception as e:
-		print(f"[-] File transfer failed: {e}")
+		print(f"[-] Failed to send file: {e}")
+		traceback.print_exc()
 
 
 def SSHClientLoop(targetIP, username, password):
