@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import subprocess
 import sys
+import json
 
 # Add local paths
 # If you didn't clone kiwi into a root, change this path
@@ -36,6 +37,19 @@ RECON           EXPLOIT        UTILITY
 [subdomain  ]   [          ]   [ssh       ]
 [netmonitor ]   [          ]   [ftp       ]
 [dirbuster  ]   [          ]   [dnstool   ]"""
+
+# Log information
+def newLog(logData):
+	try:
+		with open("/kiwi/log/log.json", "r") as logFile:
+			logContents = json.load(logFile)
+	except (json.JSONDecodeError, FileNotFoundError):
+		logContents = []
+
+	logContents.append(logData)
+
+	with open("/kiwi/log/log.json", "w") as logFile:
+		json.dump(logContents, logFile, indent=4)
 
 def processCommand(commandString):
 	tokenList = commandString.lower().split(" ")
@@ -161,7 +175,13 @@ def processCommand(commandString):
 		passwordFilename = tokenList[3]
 		service = tokenList[4]
 
-		bruteclaw.bruteForce(targetIP, usernameFilename, passwordFilename, service)
+		bufferData = bruteclaw.bruteForce(targetIP, usernameFilename, passwordFilename, service)
+
+	with open("/kiwi/etc/kiwistrikerconfig.json") as configFile:
+		configData = json.load(configFile)
+
+	if bufferData != None and configData.get("logging", False) == True:
+		newLog(bufferData)
 
 
 def mainCLI():
