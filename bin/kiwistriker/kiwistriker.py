@@ -8,8 +8,8 @@ sys.path.append("/kiwi/bin/kiwistriker/modules/exploit")
 sys.path.append("/kiwi/bin/kiwistriker/modules/recon")
 sys.path.append("/kiwi/bin/kiwistriker/modules/utility")
 
-import bruteclaw, shellshock, xpoverflow
-import dirbuster, netmonitor, portscanner, subdomainfind, vulnscan
+import bruteclaw
+import dirbuster, netmonitor, portscanner, subdomainfind
 import dnstool, encrypt, ftpclient, sshclient
 
 ansiGreen = "\x1b[32m"
@@ -31,13 +31,11 @@ banner = """
 /____//_/ /_/ |_/___/_/ |_/_____/_/ |_|"""
 
 commands = """
-RECON            EXPLOIT       UTILITY
-[portscanner]   [xpoverflow]   [encrypt   ]
-[vulnscan   ]   [bruteclaw ]   [sshclient ]
-[netmonitor ]   [shellshock]   [ftpclient ]
-[dirbuster  ]   [          ]   [dnstool   ]
-[subdomain  ]   [          ]   [          ]"""
-
+RECON           EXPLOIT        UTILITY
+[portscanner]   [bruteclaw ]   [encrypt   ]
+[subdomain  ]   [          ]   [ssh       ]
+[netmonitor ]   [          ]   [ftp       ]
+[dirbuster  ]   [          ]   [dnstool   ]"""
 
 def processCommand(commandString):
 	tokenList = commandString.lower().split(" ")
@@ -56,11 +54,6 @@ def processCommand(commandString):
 		subprocess.run("clear")
 		print(ansiBlue + ansiBold + banner + ansiReset)
 		print(commands)
-
-	# Vulnscan
-	elif len(tokenList) == 3 and tokenList[0] == "vulnscan":
-		if tokenList[1] == "xpoverflow":
-			bufferData = vulnscan.checkXPOverflow(tokenList[2])
 	
 	# Portscanner
 	elif len(tokenList) == 3 and tokenList[0] == "portscanner":
@@ -160,15 +153,6 @@ def processCommand(commandString):
 		password = tokenList[3]
 
 		sshclient.SSHClientLoop(targetIP, username, password)
-
-
-	# Shellshock exploit
-	elif len(tokenList) >= 4 and tokenList[0] == "shellshock":
-		target = tokenList[1]
-		CGIPath = tokenList[2]
-		bashCode = tokenList[3:]
-
-		shellshock.shellshockAttack(target, CGIPath, bashCode)
 
 	# Bruteclaw password bruteforcer
 	elif len(tokenList) == 5 and tokenList[0] == "bruteclaw":
