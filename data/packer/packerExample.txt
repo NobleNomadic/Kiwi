@@ -1,0 +1,4 @@
+connect scanme.nmap.org 80
+send GET / HTTP/1.1\r\nHost: scanme.nmap.org\r\nConnection: close\r\n\r\n
+receive 2048
+close

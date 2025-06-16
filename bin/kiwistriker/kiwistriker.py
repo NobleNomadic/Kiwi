@@ -9,7 +9,7 @@ sys.path.append("/kiwi/bin/kiwistriker/modules/exploit")
 sys.path.append("/kiwi/bin/kiwistriker/modules/recon")
 sys.path.append("/kiwi/bin/kiwistriker/modules/utility")
 
-import bruteclaw
+import bruteclaw, packer
 import dirbuster, netmonitor, portscanner, subdomainfind
 import dnstool, encrypt, ftpclient, sshclient
 
@@ -34,7 +34,7 @@ banner = """
 commands = """
 RECON           EXPLOIT        UTILITY
 [portscanner]   [bruteclaw ]   [encrypt   ]
-[subdomain  ]   [          ]   [ssh       ]
+[subdomain  ]   [packer    ]   [ssh       ]
 [netmonitor ]   [          ]   [ftp       ]
 [dirbuster  ]   [          ]   [dnstool   ]"""
 
@@ -52,7 +52,7 @@ def newLog(logData):
 		json.dump(logContents, logFile, indent=4)
 
 def processCommand(commandString):
-	tokenList = commandString.lower().split(" ")
+	tokenList = commandString.split(" ")
 	bufferData = None	# Buffer used to store the return data of commands
 
 	# Return on empty command
@@ -176,6 +176,12 @@ def processCommand(commandString):
 		service = tokenList[4]
 
 		bufferData = bruteclaw.bruteForce(targetIP, usernameFilename, passwordFilename, service)
+
+	# Packer script execution
+	elif len(tokenList) == 2 and tokenList[0] == "packer":
+		scriptName = tokenList[1]
+		packer.packetStrike(scriptName)
+
 
 	with open("/kiwi/etc/kiwistrikerconfig.json") as configFile:
 		configData = json.load(configFile)
