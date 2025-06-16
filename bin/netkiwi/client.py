@@ -30,6 +30,7 @@ def connectHTTP(targetIP, port):
                 break
             response += chunk
         except socket.timeout:
+            clientSocket.close()
             break
 
     print(response.decode(errors="replace"))
