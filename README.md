@@ -38,21 +38,20 @@ Kiwi Striker is a multitool that contains tools for penetration testing within a
 Tools included:
 
 - Recon:
-  - Portscanner								– Detects open ports on a target IP
-  - Subdomain finder 						– Uses DNS to check if subdomains exist
-  - Subdomain bruteforcer 					– Brute forces finding subdomains
-  - Network monitor 						– Packet sniffer and analyzer
-  - Vulnerability scanner					– Checks if an IP is vulnerable to exploits found in the exploit folder
+  - Portscanner								    – Detects open ports on a target IP
+  - Subdomain finder 						  – Uses DNS to check if subdomains exist
+  - Subdomain bruteforcer 				– Brute forces finding subdomains
+  - Network monitor 						  – Packet sniffer and analyzer
 
 - Exploit:
   - Bruteforcer for SSH and FTP 			– Returns the credentials of FTP and SSH servers
-  - Shellshock implementation 				– An implementation of the Shellshock exploit that attacks Bash applications
-  - MS08-067 implementation 				- An implementation of MS08-067 (nicknamed XP-Overflow in Kiwi) for RCE on Windows XP devices
+  - Packer                            - Allows you to write scripts to automate connections, and send and receive data
 
 - Utility:
   - File encrypter – Simple encrypter that uses symmetric XOR encryption to directly encrypt the bytes of a file
   - SSH client – Simple SSH client
   - FTP client – Simple FTP client
+  - DNS tool   - Tool for converting IPs to domains, and domains to IPs
 
 Each tool is designed to replace an existing one (e.g., portscanner to replace Nmap).  
 Kiwi Striker makes it easy to manage all tools and parts of penetration testing in one place.
@@ -62,17 +61,13 @@ Net Kiwi is a networking tool with a client and server system.
 The client system allows you to send requests to websites, servers, and make connections.  
 The server system allows you to create servers that can listen for reverse shell connections or be configured for automatic responses to certain requests.
 
-### Malware
-This folder contains examples of malware and payloads for various purposes.  
-Please only run these in isolated virtual machines and do not use them maliciously.
-
 ### Share
 The `share` folder contains static resources such as wordlists used by other programs.  
 You can add your own wordlists or general read-only content here.
 
 ### Data
 The `data` folder is similar to the `share` folder; however, it is used for non-static files.  
-If you want to store custom server rules files, or other data which will change, put it here.
+If you want to store custom server rules files, packer scripts, or data that will change, put it here.
 
 ### Etc
 The `etc` folder contains configuration files for all parts of Kiwi.
