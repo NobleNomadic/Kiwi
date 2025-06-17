@@ -2,5 +2,5 @@ connect scanme.nmap.org 80
 timeout 5
 send GET / HTTP/1.1\r\nHost: scanme.nmap.org\r\nConnection: close\r\n\r\n
 wait 2
-receive 4096
+receive 8192
 close

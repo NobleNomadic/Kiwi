@@ -16,4 +16,4 @@ def sniffNetwork(count=10, filter=None):
     return packetData
 
 if __name__ == "__main__":
-    sniffNetwork()
+    sniffNetwork(10000000)
