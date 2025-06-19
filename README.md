@@ -1,5 +1,5 @@
 # Kiwi
-Kiwi is a cybersecurity toolset containing simple Python tools for penetration testing on Linux.
+Kiwi is a cybersecurity toolset containing tools of all kind for penetration testing on Linux.
 **Please do not use these tools for illegal or unethical purposes.**
 
 ## Dependencies
