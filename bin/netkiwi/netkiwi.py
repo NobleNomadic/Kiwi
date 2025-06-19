@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-<<<<<<< HEAD
 import subprocess
 import client, server
 
@@ -13,7 +12,6 @@ ansiReset = "\x1b[0m"
 
 banner = """TEMP"""
 commands = """COMMAND LIST"""
-
 
 def processCommand(command):
     tokenList = command.split(" ")
@@ -33,7 +31,6 @@ def processCommand(command):
         except:
             pass
 
-
 def mainCLI():
     subprocess.run("cls")
     print(ansiGreen + ansiBold + banner + ansiReset)
@@ -46,6 +43,3 @@ def mainCLI():
 
 if __name__ == "__main__":
     mainCLI()
-=======
-import client, server
->>>>>>> 7d8a803 (Working on server system)
