@@ -33,6 +33,7 @@ def processCommand(command):
     elif tokenList[0] == "clear" or tokenList[0] == "reset":
         subprocess.run("clear")
         print(ansiGreen + banner + ansiReset)
+        print(commands)
 
     # Client command
     elif len(tokenList) == 4 and tokenList[0] == "client":
