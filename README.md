@@ -80,4 +80,4 @@ If this repository has added example logs, you should remove the logs, but keep 
 ## Final Notes
 Kiwi is meant to be customized. I have tried to keep the codebase as simple as possible so that anybody with an understanding of Python can make their own changes directly to the code.
 Everybody, especially beginners are welcome to add their tools to the kiwi repository. If you are learning how to create your own cybersecurity tools, feel free to put a copy of the code in the bin folder. By doing this, you can get quicker feedback from other people who work on kiwi, and get your code into a more public space.
-Also note that Kiwi is designed for Linux only. You may be able to get some parts may work on Windows, but it most of kiwi is made with Windows in mind.
+Also note that Kiwi is designed for Linux only. You may be able to get some parts to work on Windows, but I have not created anything with Windows in mind.
