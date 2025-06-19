@@ -90,16 +90,19 @@ def connectBasic(targetIP, port):
     clientSocket.close()
     return
 
+def netkiwiClient(targetIP, port, mode):
+    if mode == "http":
+        connectHTTP(targetIP, port)
+    else:
+        connectBasic(targetIP, port)
+
 if __name__ == "__main__":
     if len(sys.argv) != 4:
         print("Usage: python3 client.py <IP> <port> <basic|http>")
         exit(1)
 
-    ip = sys.argv[1]
+    targetIP = sys.argv[1]
     port = int(sys.argv[2])
     mode = sys.argv[3].lower()
 
-    if mode == "http":
-        connectHTTP(ip, port)
-    else:
-        connectBasic(ip, port)
+    netkiwiClient(targetIP, port, mode)

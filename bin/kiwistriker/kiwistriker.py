@@ -4,7 +4,7 @@ import sys
 import json
 
 # Add local paths
-# If you didn't clone kiwi into a root, change this path
+# If you didn't clone kiwi into root, change this path
 sys.path.append("/kiwi/bin/kiwistriker/modules/exploit")
 sys.path.append("/kiwi/bin/kiwistriker/modules/recon")
 sys.path.append("/kiwi/bin/kiwistriker/modules/utility")
