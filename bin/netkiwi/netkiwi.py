@@ -7,11 +7,17 @@ ansiGreen = "\x1b[32m"
 ansiBlue = "\x1b[34m"
 ansiRed = "\x1b[31m"
 ansiYellow = "\x1b[33m"
-ansiBold = "\x1b[1m"
 ansiReset = "\x1b[0m"
 
-banner = """TEMP"""
-commands = """COMMAND LIST"""
+banner = """
+    _   ______________   __ __ _____       ______
+   / | / / ____/_  __/  / //_//  _/ |     / /  _/
+  /  |/ / __/   / /    / ,<   / / | | /| / // /  
+ / /|  / /___  / /    / /| |_/ /  | |/ |/ // /   
+/_/ |_/_____/ /_/    /_/ |_/___/  |__/|__/___/"""
+commands = """
+[client <IP> <port> <basic|http>              ]
+[server <port> <mode>                         ]"""
 
 def processCommand(command):
     tokenList = command.split(" ")
@@ -19,8 +25,17 @@ def processCommand(command):
     if len(tokenList) == 0:
         return
 
-    # Client utility
-    if len(tokenList) == 4 and tokenList[0] == "client":
+    # Admin commands for controlling netkiwi
+    if tokenList[0] == "exit":
+        subprocess.run("clear")
+        exit(0)
+
+    elif tokenList[0] == "clear" or tokenList[0] == "reset":
+        subprocess.run("clear")
+        print(ansiGreen + banner + ansiReset)
+
+    # Client command
+    elif len(tokenList) == 4 and tokenList[0] == "client":
         try:
             targetIP = tokenList[1]
             port = int(tokenList[2])
@@ -31,9 +46,20 @@ def processCommand(command):
         except:
             pass
 
+    # Server command
+    elif len(tokenList) == 3 and tokenList[0] == "server":
+        try:
+            port = int(tokenList[1])
+            mode = tokenList[2]
+
+            server.setupServer(port, mode)
+
+        except:
+            pass
+
 def mainCLI():
     subprocess.run("clear")
-    print(ansiGreen + ansiBold + banner + ansiReset)
+    print(ansiGreen + banner + ansiReset)
     print(commands)
 
     while True:
