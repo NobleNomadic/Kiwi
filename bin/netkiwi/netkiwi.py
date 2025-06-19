@@ -32,7 +32,7 @@ def processCommand(command):
             pass
 
 def mainCLI():
-    subprocess.run("cls")
+    subprocess.run("clear")
     print(ansiGreen + ansiBold + banner + ansiReset)
     print(commands)
 
