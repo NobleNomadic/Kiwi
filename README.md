@@ -44,14 +44,14 @@ Tools included:
   - Network monitor 						  – Packet sniffer and analyzer
 
 - Exploit:
-  - Bruteforcer for SSH and FTP 			– Returns the credentials of FTP and SSH servers
-  - Packer                            - Allows you to write scripts to automate connections, and send and receive data
+  - Bruteforcer for SSH and FTP 	- Returns the credentials of FTP and SSH servers
+  - Packer                        - Allows you to write scripts to automate connections, and send and receive data
 
 - Utility:
-  - File encrypter – Simple encrypter that uses symmetric XOR encryption to directly encrypt the bytes of a file
-  - SSH client – Simple SSH client
-  - FTP client – Simple FTP client
-  - DNS tool   - Tool for converting IPs to domains, and domains to IPs
+  - File encrypter                – Simple encrypter that uses symmetric XOR encryption to directly encrypt the bytes of a file
+  - SSH client                    – Simple SSH client
+  - FTP client                    – Simple FTP client
+  - DNS tool                      - Tool for converting IPs to domains, and domains to IPs
 
 Each tool is designed to replace an existing one (e.g., portscanner to replace Nmap).  
 Kiwi Striker makes it easy to manage all tools and parts of penetration testing in one place.
@@ -78,6 +78,6 @@ Be careful changing anything in this folder, as most programs in Kiwi expect cer
 If this repository has added example logs, you should remove the logs, but keep the main array containing all logs.
 
 ## Final Notes
-Kiwi is meant to be customized. I have tried to keep the codebase as simple as possible so that anybody with an understanding of Python can make their own changes directly to the code.
-Everybody, especially beginners are welcome to add their tools to the kiwi repository. If you are learning how to create your own cybersecurity tools, feel free to put a copy of the code in the bin folder. By doing this, you can get quicker feedback from other people who work on kiwi, and get your code into a more public space.
+Kiwi is meant to be customized. I have tried to keep the codebase as simple as possible so that anybody with an understanding of programming can make their own changes directly to the code.
+Everybody, especially beginners are welcome to add their tools to the kiwi repository.
 Also note that Kiwi is designed for Linux only. You may be able to get some parts to work on Windows, but I have not created anything with Windows in mind.
