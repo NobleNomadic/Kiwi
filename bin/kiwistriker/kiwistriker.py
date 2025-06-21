@@ -51,7 +51,7 @@ def newLog(logData):
 	with open("/kiwi/log/log.json", "w") as logFile:
 		json.dump(logContents, logFile, indent=4)
 
-def processCommand(commandString):
+def processCommand(commandString, silentMode=False):
 	tokenList = commandString.split(" ")
 	bufferData = None	# Buffer used to store the return data of commands
 
@@ -59,15 +59,17 @@ def processCommand(commandString):
 	if len(tokenList) == 0:
 		return
 
-	# Admin commands for managing kiwi striker without interacting with modules
+	# Admin commands for managing kiwi striker without interacting with modules	elif tokenList[0] == "exit":
 	elif tokenList[0] == "exit":
 		subprocess.run("clear")
 		exit(0)
 
 	elif tokenList[0] == "clear" or tokenList[0] == "reset":
 		subprocess.run("clear")
-		print(ansiBlue + ansiBold + banner + ansiReset)
-		print(commands)
+
+		if silentMode == False:
+			print(ansiBlue + ansiBold + banner + ansiReset)
+			print(commands)
 	
 	# Portscanner
 	elif len(tokenList) == 3 and tokenList[0] == "portscanner":
@@ -190,15 +192,21 @@ def processCommand(commandString):
 		newLog(bufferData)
 
 
-def mainCLI():
+def mainCLI(silentMode=False):
 	subprocess.run("clear")
-	print(ansiBlue + ansiBold + banner + ansiReset)
-	print(commands)
+
+	if silentMode == False:
+		print(ansiBlue + ansiBold + banner + ansiReset)
+		print(commands)
 
 	while True:
 		command = input(">>> ")
-		processCommand(command)
+		processCommand(command, silentMode)
 
 
 if __name__ == "__main__":
-	mainCLI()
+	if len(sys.argv) == 1:
+		mainCLI(False)
+
+	elif len(sys.argv) == 2 and sys.argv[1] == "silent":
+		mainCLI(True)

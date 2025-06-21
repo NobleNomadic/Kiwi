@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import subprocess
+import sys
 import client, server
 
 # Color definitions
@@ -58,10 +59,12 @@ def processCommand(command):
         except:
             pass
 
-def mainCLI():
+def mainCLI(silentMode=False):
     subprocess.run("clear")
-    print(ansiGreen + banner + ansiReset)
-    print(commands)
+
+    if silentMode == False:
+        print(ansiGreen + banner + ansiReset)
+        print(commands)
 
     while True:
         command = input(">>> ")
@@ -69,4 +72,8 @@ def mainCLI():
 
 
 if __name__ == "__main__":
-    mainCLI()
+    if len(sys.argv) == 1:
+        mainCLI(False)
+
+    elif len(sys.argv) == 2 and sys.argv[1] == "silent":
+        mainCLI(True)

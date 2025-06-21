@@ -1,4 +1,4 @@
-# Contributing to Kiwi
+# Contributing
 The kiwi repository is meant for everyone to add their own tools. Even if you are a beginner and are just looking for feedback, please feel welcome to use this repository to house your tools.
 Even simply using kiwi as a place to store your tool's code while you develop it can help with finding feedback.
 
