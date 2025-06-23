@@ -3,6 +3,9 @@ import socket
 import threading
 import sys
 
+# Echo server
+# Receive data, send it back, and then close connection
+# Client handler
 def echoHandleClient(clientSocket, clientAddress):
 	print(f"[+] Connection from {clientAddress}")
 
@@ -19,6 +22,7 @@ def echoHandleClient(clientSocket, clientAddress):
 	clientSocket.close()
 	return
 
+# Listen and accept connections
 def echoServerListen(listenerPort):
 	# Setup a socket to listen for connections
 	listenerSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -33,6 +37,50 @@ def echoServerListen(listenerPort):
 		clientSocket, clientAddress = listenerSocket.accept()
 		clientThread = threading.Thread(target=echoHandleClient, args=(clientSocket, clientAddress))
 		clientThread.start()
+
+
+# File server can send and receive files
+# Upload protcal:
+# Client sends upload request
+# UPLOAD: <remote filename>
+# Server sends response:
+# ACCEPT or DENY
+# If accepted, client sends data
+# 1 line of data for the file (max 2048 bytes)
+# Once finished, client sends code to signal end of file
+# \:ENDTRANSFER
+def fileHandleClient(clientSocket, clientAddress):
+	print(f"[+] Connection from {clientAddress}")
+
+	# Main loop
+	while True:
+		# Receive request for function
+		data = clientSocket.recv(1024).decode()
+		print(f"[+] Request sent from {clientAddress}")
+
+		tokenList = data.split(" ")
+
+		if len(tokenList) == 0:
+			response = "DENY".encode()
+			clientSocket.send(response)
+
+		if len(tokenList) == 2 and tokenList[0] == "UPLOAD":
+			
+
+
+def fileServerListen(listenerPort):
+	# Setup listener socket
+	listenerSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	listenerSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+	listenerSocket.bind(("0.0.0.0", listenerPort))
+	listenerSocket.listen(5)
+
+	print(f"[*] File server listening on port {listenerPort}")
+
+	# Accept connections
+	while True:
+		clientSocket, clientAddress = listenerSocket.accept()
+		clientThread = threading.Thread(target=fileHandleClient, args=(clientSocket, clientAddress))
 
 
 def setupServer(listenerPort, serverFlag="echo"):
