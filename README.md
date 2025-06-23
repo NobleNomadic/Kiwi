@@ -1,5 +1,5 @@
 # Kiwi
-Kiwi is a cybersecurity toolset containing tools of all kind for penetration testing on Linux.
+Kiwi is a cybersecurity toolset containing tools for penetration testing.
 **Please do not use these tools for illegal or unethical purposes.**
 
 ## Dependencies
@@ -13,8 +13,6 @@ To make sure all code runs properly, make sure the following is installed:
   - `dnspython`
 
 ## Using Kiwi
-Kiwi is designed to be cloned into the root directory system and customized.
-It is important that this done to make sure that the local imports work. Currently, kiwi striker will import from /kiwi/bin/kiwistriker/modules, and cloning the repo into another directory won't work unless you modify the import paths in kiwi striker  
 You can run some modules and various parts directly, but if you want the simplest experience, run one of the following:
 
 - ```bash
@@ -80,4 +78,3 @@ If this repository has added example logs, you should remove the logs, but keep 
 ## Final Notes
 Kiwi is meant to be customized. I have tried to keep the codebase as simple as possible so that anybody with an understanding of programming can make their own changes directly to the code.
 Everybody, especially beginners are welcome to add their tools to the kiwi repository.
-Also note that Kiwi is designed for Linux only. You may be able to get some parts to work on Windows, but I have not created anything with Windows in mind.

@@ -2,12 +2,15 @@
 import subprocess
 import sys
 import json
+import os
+
+# Get current cloned location
+BASEDIR = os.path.dirname(os.path.abspath(__file__))
 
 # Add local paths
-# If you didn't clone kiwi into root, change this path
-sys.path.append("/kiwi/bin/kiwistriker/modules/exploit")
-sys.path.append("/kiwi/bin/kiwistriker/modules/recon")
-sys.path.append("/kiwi/bin/kiwistriker/modules/utility")
+sys.path.append(os.path.join(BASEDIR, "modules", "recon"))
+sys.path.append(os.path.join(BASEDIR, "modules", "exploit"))
+sys.path.append(os.path.join(BASEDIR, "modules", "utility"))
 
 import bruteclaw, packer
 import dirbuster, netmonitor, portscanner, subdomainfind
@@ -41,14 +44,14 @@ RECON           EXPLOIT        UTILITY
 # Log information
 def newLog(logData):
 	try:
-		with open("/kiwi/log/log.json", "r") as logFile:
+		with open(os.path.join(BASEDIR, "..", "..", "log", "log.json"), "r") as logFile:
 			logContents = json.load(logFile)
 	except (json.JSONDecodeError, FileNotFoundError):
 		logContents = []
 
 	logContents.append(logData)
 
-	with open("/kiwi/log/log.json", "w") as logFile:
+	with open(os.path.join(BASEDIR, "..", "..", "log", "log.json"), "w") as logFile:
 		json.dump(logContents, logFile, indent=4)
 
 def processCommand(commandString, silentMode=False):
@@ -185,7 +188,7 @@ def processCommand(commandString, silentMode=False):
 		packer.packetStrike(scriptName)
 
 
-	with open("/kiwi/etc/kiwistrikerconfig.json") as configFile:
+	with open(os.path.join(BASEDIR, "..", "..", "etc", "kiwistrikerconfig.json")) as configFile:
 		configData = json.load(configFile)
 
 	if bufferData != None and configData.get("logging", False) == True:
@@ -193,9 +196,8 @@ def processCommand(commandString, silentMode=False):
 
 
 def mainCLI(silentMode=False):
-	subprocess.run("clear")
-
 	if silentMode == False:
+		subprocess.run("clear")
 		print(ansiBlue + ansiBold + banner + ansiReset)
 		print(commands)
 

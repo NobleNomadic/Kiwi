@@ -60,9 +60,8 @@ def processCommand(command):
             pass
 
 def mainCLI(silentMode=False):
-    subprocess.run("clear")
-
     if silentMode == False:
+        subprocess.run("clear")
         print(ansiGreen + banner + ansiReset)
         print(commands)
 
