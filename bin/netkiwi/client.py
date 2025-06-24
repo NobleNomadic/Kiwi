@@ -44,7 +44,7 @@ def clientConnectionLoop(clientSocket, targetIP):
             if command.lower() in ('exit', 'quit'):
                 break
 
-            clientSocket.send(command.encode() + b'\n')
+            clientSocket.send(command.encode())
 
             # Receive response after sending
             response = clientSocket.recv(4096)
