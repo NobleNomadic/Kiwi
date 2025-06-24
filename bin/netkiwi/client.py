@@ -37,7 +37,7 @@ def connectHTTP(targetIP, port):
     clientSocket.close()
     return
 
-def clientConnectionLoop(clientSocket, targetIP):
+def basicClientConnectionLoop(clientSocket, targetIP):
     while True:
         try:
             command = input(f"{targetIP}> ")
@@ -84,21 +84,81 @@ def connectBasic(targetIP, port):
     clientSocket.settimeout(None)
 
     # Start basic connection loop
-    clientConnectionLoop(clientSocket, targetIP)
+    basicClientConnectionLoop(clientSocket, targetIP)
 
     # Clean up and exit
     clientSocket.close()
     return
 
+
+def fileClientSendFile(clientSocket, localFilename, remoteFilename):
+    # Create a list of items where each item is a line of the local file
+    localFiledata = []
+
+    with open(localFilename, "r") as localFile:
+        for line in localFile:
+            localFiledata.append(line.strip())
+
+    # Loop over each line of data
+    # Wait to receive the READY code, then send a line of data
+    for line in localFiledata:
+        # Get the ready message from the server
+        readyCodeResponse = clientSocket.recv(1024).decode()
+        if readyCodeResponse != "READY":
+            return
+
+        # Send the data
+        lineData = line.encode()
+        clientSocket.send(lineData)
+
+def fileTransferClientLoop(clientSocket):
+    # Main connection loop where commands can be manually sent
+    while True:
+        command = input(f"{targetIP}> ")
+        tokenList = commmand.split(" ")
+
+        if len(tokenList) == 3 and tokenList[0].lower() == "upload":
+            localFilename = tokenList[1]
+            remoteFilename = tokenList[2]
+
+            # Send request to upload a file
+            # The request is made of the command and the remote filename
+            uploadReqest = f"UPLOAD {remoteFilename}".encode()
+            clientSocket.send(uploadRequest)
+
+            # Check to see if the upload request was accepted
+            uploadRequestResponse = clientSocket.recv(1024).decode()
+
+            if uploadRequestResponse == "ACCEPT":
+                fileClientSendFile(clientSocket, localFilename, remoteFilename)
+
+
+def connectFileTransfer(targetIP, port):
+    clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    clientSocket.settimeout(3)
+
+    try:
+        clientSocket.connect((targetIP, port))
+
+    except Exception as e:
+        print(f"[-] Error: {e}")
+        return
+
+    # Connection succeeded, start main loop with the client object
+    fileTransferClientLoop(clientSocket)
+
 def netkiwiClient(targetIP, port, mode):
-    if mode == "http":
+    if mode.lower() == "http":
         connectHTTP(targetIP, port)
+    elif mode.lower() == "file":
+        connectFileTransfer(targetIP, port)
+    
     else:
         connectBasic(targetIP, port)
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
-        print("Usage: python3 client.py <IP> <port> <basic|http>")
+        print("Usage: python3 client.py <IP> <port> <mode>")
         exit(1)
 
     targetIP = sys.argv[1]

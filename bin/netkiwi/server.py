@@ -73,21 +73,22 @@ def fileHandleClient(clientSocket, clientAddress):
 
 	# Main loop
 	while True:
-		# Receive request for function
-		data = clientSocket.recv(1024).decode()
-		print(f"[+] Request sent from {clientAddress}")
+		try:
+			# Receive request for function
+			data = clientSocket.recv(1024).decode()
+			print(f"[+] Request sent from {clientAddress}")
 
-		# Convert the message into a set of tokens
-		tokenList = data.split(" ")
+			# Convert the message into a set of tokens
+			tokenList = data.split(" ")
 
-		if len(tokenList) == 0:
-			response = "DENY".encode()
-			clientSocket.send(response)
+			if len(tokenList) == 0:
+				response = "DENY".encode()
+				clientSocket.send(response)
 
 		# FILE UPLOADS
 		if len(tokenList) == 2 and tokenList[0] == "UPLOAD":
 			# Here you could add logic for scanning the file for malware, add a password, or another system for allowing and denying files
-			# For now, it will default to allowing
+			# For now, it will default to allowing and sending the ACCEPT response
 			data = "ACCEPT".encode()
 			clientSocket.send(data)
 
@@ -106,7 +107,9 @@ def fileHandleClient(clientSocket, clientAddress):
 			# Send final ackknowledgement packet when finished writing data
 			finalMessage = "FINISH".encode()
 			clientSocket.send(finalMessage)
-			s.close()		
+			s.close()
+		except Exception as e:
+			print(f"[-] Error: {e}")
 
 def fileServerListen(listenerPort):
 	# Setup listener socket
