@@ -85,29 +85,30 @@ def fileHandleClient(clientSocket, clientAddress):
 				response = "DENY".encode()
 				clientSocket.send(response)
 
-		# FILE UPLOADS
-		if len(tokenList) == 2 and tokenList[0] == "UPLOAD":
-			# Here you could add logic for scanning the file for malware, add a password, or another system for allowing and denying files
-			# For now, it will default to allowing and sending the ACCEPT response
-			data = "ACCEPT".encode()
-			clientSocket.send(data)
+			# FILE UPLOADS
+			if len(tokenList) == 2 and tokenList[0] == "UPLOAD":
+				# Here you could add logic for scanning the file for malware, add a password, or another system for allowing and denying files
+				# For now, it will default to allowing and sending the ACCEPT response
+				data = "ACCEPT".encode()
+				clientSocket.send(data)
 
-			remoteFilename = tokenList[1]
-			print(f"[*] Receiving file {remoteFilename} from {clientAddress}")
+				remoteFilename = tokenList[1]
+				print(f"[*] Receiving file {remoteFilename} from {clientAddress}")
 
-			# Store the contents of the file in a buffer
-			fileData = receiveFileData(clientSocket)
+				# Store the contents of the file in a buffer
+				fileData = receiveFileData(clientSocket)
 
-			# Write the data to a new file in the files folder
-			filePath = f"files/{remoteFilename}"
-			with open(filePath, "w") as newFile:
-				for line in fileData:
-					newFile.write(line)
+				# Write the data to a new file in the files folder
+				filePath = f"files/{remoteFilename}"
+				with open(filePath, "w") as newFile:
+					for line in fileData:
+						newFile.write(line)
 
-			# Send final ackknowledgement packet when finished writing data
-			finalMessage = "FINISH".encode()
-			clientSocket.send(finalMessage)
-			s.close()
+				# Send final ackknowledgement packet when finished writing data
+				finalMessage = "FINISH".encode()
+				clientSocket.send(finalMessage)
+				s.close()
+
 		except Exception as e:
 			print(f"[-] Error: {e}")
 
