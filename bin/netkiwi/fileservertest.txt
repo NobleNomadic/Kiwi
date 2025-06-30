@@ -1,0 +1,8 @@
+THIS IS A FILE MADE FOR TESTING THE FILE TRANSFER SERVER.
+It includes:
+- Multiple lines
+- Special chars: #@!$%^&*
+- And every letter: The quick brown fox jumps over the lazy dog
+
+Test the file server by uploading this file to it.
+It will move this file into the files folder
