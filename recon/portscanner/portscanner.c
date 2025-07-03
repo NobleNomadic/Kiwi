@@ -25,12 +25,13 @@ int checkPort(const char *targetIP, int port, int timeoutSeconds) {
 void scanIP(const char *targetIP, int portList[], int portCount, int flag) {
     int timeoutSeconds = 1;
     int loggingLevel = 0; // 0 = no logging, 1 = log open ports, 2 = log open and closed
-    int verboseText = 0;
+    int verboseText = 0; // 0 only show open ports, 1 show state of all scanned ports
 
-    if (flag & LONGTIMEOUT_FLAG) timeoutSeconds = 3;
-    if (flag & VERBOSETEXT_FLAG) verboseText = 1;
-    if (flag & LOGGING_FLAG) loggingLevel = 1;
-    if (flag & VERBOSELOG_FLAG) loggingLevel = 2;
+    // Check each flag
+    if (flag & LONGTIMEOUT_FLAG) timeoutSeconds = 3; // Increase timeout if longtimeout was set for slower networks
+    if (flag & VERBOSETEXT_FLAG) verboseText = 1;    // Print state of all ports
+    if (flag & LOGGING_FLAG) loggingLevel = 1;       // Log open ports to a file
+    if (flag & VERBOSELOG_FLAG) loggingLevel = 2;    // Log open and closed ports to a file
 
     FILE *loggingFile = NULL;
     if (loggingLevel > 0) {
@@ -42,6 +43,7 @@ void scanIP(const char *targetIP, int portList[], int portCount, int flag) {
         fprintf(loggingFile, "%s\n", targetIP);
     }
 
+    // Loop over ports
     for (int i = 0; i < portCount; i++) {
         if (verboseText) {
             printf("[*] Scanning port %d\n", portList[i]);
@@ -59,6 +61,7 @@ void scanIP(const char *targetIP, int portList[], int portCount, int flag) {
         }
     }
 
+    // If logging was enabled, then close the logging file
     if (loggingFile) {
         fclose(loggingFile);
     }
@@ -72,17 +75,19 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    // Get CLI arguments
     const char *targetIP = argv[1];
     const char *scanfileFilename = argv[2];
 
     configFileData scanfileData = loadConfigFile(scanfileFilename);
 
-    // Null check just in case
+    // Null check in case the scanfile can't be found
     if (!scanfileData.intArray || scanfileData.intCount == 0) {
         fprintf(stderr, "Invalid scan file or no ports to scan.\n");
         return 1;
     }
 
+    // Convert the structure returned by config lib into a set of variables
     int flag = scanfileData.header;
     int *portList = scanfileData.intArray;
     int portCount = scanfileData.intCount;

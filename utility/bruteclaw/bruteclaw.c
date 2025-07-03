@@ -4,7 +4,7 @@
 #include <string.h>
 #include <pthread.h>
 
-#define MAX_THREADS 8
+#define MAX_THREADS 12
 
 typedef struct {
     char ip[64];
