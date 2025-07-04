@@ -1,21 +1,22 @@
-#include "../../lib/sshlib.h"
+
+#include "../../lib/ftplib.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 
-// Interactive SSH client loop
-int sshClient(const char *targetIP, const char *username, const char *password) {
-    SSHConnection *sshObject = sshConnect(targetIP, 22, username, password);
-    if (!sshObject) {
-        printf("[-] SSH setup failure\n");
+// Interactive FTP client loop
+int ftpClient(const char *targetIP, const char *username, const char *password) {
+    FTPConnection *ftpObject = ftpConnect(targetIP, 21, username, password);
+    if (!ftpObject) {
+        printf("[-] FTP setup failure\n");
         return -1;
     }
-    printf("[+] Connected to SSH on %s\n", targetIP);
+    printf("[+] Connected to FTP on %s\n", targetIP);
 
     char input[256];
     while (1) {
-        printf("SSH@%s> ", targetIP);
+        printf("FTP@%s> ", targetIP);
         if (!fgets(input, sizeof(input), stdin)) {
             printf("\n[-] Input error or EOF\n");
             break;
@@ -36,7 +37,7 @@ int sshClient(const char *targetIP, const char *username, const char *password) 
                 continue;
             }
             strtok(input, "\n");
-            if (sshRunCommand(sshObject, input) != 0) {
+            if (ftpRunCommand(ftpObject, input) != 0) {
                 printf("[-] Command execution failure\n");
             }
             continue;
@@ -57,7 +58,7 @@ int sshClient(const char *targetIP, const char *username, const char *password) 
                 continue;
             }
             strtok(remotePath, "\n");
-            if (sshUploadFile(sshObject, localPath, remotePath) != 0) {
+            if (ftpUploadFile(ftpObject, localPath, remotePath) != 0) {
                 printf("[-] Upload failed\n");
             }
             continue;
@@ -78,7 +79,7 @@ int sshClient(const char *targetIP, const char *username, const char *password) 
                 continue;
             }
             strtok(localPath, "\n");
-            if (sshDownloadFile(sshObject, remotePath, localPath) != 0) {
+            if (ftpDownloadFile(ftpObject, remotePath, localPath) != 0) {
                 printf("[-] Download failed\n");
             }
             continue;
@@ -88,16 +89,16 @@ int sshClient(const char *targetIP, const char *username, const char *password) 
         printf("[-] Unknown command.\n-- Available: run, upload, download, exit\n");
     }
 
-    sshDisconnect(sshObject);
+    ftpDisconnect(ftpObject);
     return 0;
 }
 
 // Main function and argument parsing
 int main(int argc, char *argv[]) {
-    printf("[*] Starting SSH Client 1.0\n");
+    printf("[*] Starting FTP Client 1.0\n");
 
     if (argc < 4) {
-        printf("Usage:./sshclient <IP> <Username> <Password>\n", argv[0]);
+        printf("Usage:./ftpclient <IP> <Username> <Password>\n", argv[0]);
         return 1;
     }
 
@@ -105,5 +106,5 @@ int main(int argc, char *argv[]) {
     const char *username = argv[2];
     const char *password = argv[3];
 
-    return sshClient(hostIP, username, password);
+    return ftpClient(hostIP, username, password);
 }
