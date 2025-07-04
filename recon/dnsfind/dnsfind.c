@@ -38,7 +38,7 @@ void findSubdomains(const char *domainName, const char *wordlistName) {
 int main(int argc, char *argv[]) {
     printf("[*] Starting DNS Finder 1.0");
     if (argc < 3) {
-        printf("Usage: %s <Domain> <Wordlist>\n", argv[0]);
+        printf("Usage: ./dnsfind <Domain> <Wordlist>\n", argv[0]);
         return 1;
     }
 
