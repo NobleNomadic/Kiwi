@@ -6,38 +6,100 @@
 #include <string.h>
 #include <curl/curl.h>
 
-// Structure for capturing output
+// FTP connection structure
+typedef struct {
+    CURL *curl;
+    char *urlBase;
+} FTPConnection;
+
+// Response structure for FTP operations
 typedef struct {
     char *data;
     size_t size;
 } FTPResponse;
 
-// Structure for a basic FTP connection using curl
-typedef struct {
-    CURL *curl;
-    char *urlBase;
-    char *username;
-    char *password;
-} FTPConnection;
+// Core FTP functions for brute forcing
+FTPConnection* ftpConnect(const char *host, int port, const char *username, const char *password);
+void ftpDisconnect(FTPConnection *ftpObject);
 
-// Callback function for writing data
+// Helper functions
+static size_t WriteCallback(void *contents, size_t size, size_t nmemb, FTPResponse *response);
+static void initFTPResponse(FTPResponse *response);
+static void freeFTPResponse(FTPResponse *response);
+static void resetCurlState(CURL *curl);
+
+// FTP connection function - tests credentials
+FTPConnection* ftpConnect(const char *host, int port, const char *username, const char *password) {
+    if (!host || !username || !password) {
+        return NULL;
+    }
+
+    FTPConnection *ftp = malloc(sizeof(FTPConnection));
+    if (!ftp) {
+        return NULL;
+    }
+
+    ftp->curl = curl_easy_init();
+    if (!ftp->curl) {
+        free(ftp);
+        return NULL;
+    }
+
+    // Build URL
+    ftp->urlBase = malloc(strlen(host) + 32);
+    snprintf(ftp->urlBase, strlen(host) + 32, "ftp://%s:%d/", host, port);
+
+    // Build credentials
+    char userpass[256];
+    snprintf(userpass, sizeof(userpass), "%s:%s", username, password);
+
+    // Configure CURL for connection test
+    curl_easy_setopt(ftp->curl, CURLOPT_URL, ftp->urlBase);
+    curl_easy_setopt(ftp->curl, CURLOPT_USERPWD, userpass);
+    curl_easy_setopt(ftp->curl, CURLOPT_TIMEOUT, 10L);
+    curl_easy_setopt(ftp->curl, CURLOPT_CONNECTTIMEOUT, 5L);
+    curl_easy_setopt(ftp->curl, CURLOPT_NOBODY, 1L);
+
+    // Test the connection
+    CURLcode result = curl_easy_perform(ftp->curl);
+    
+    if (result != CURLE_OK) {
+        ftpDisconnect(ftp);
+        return NULL;
+    }
+
+    return ftp;
+}
+
+// Disconnect and cleanup
+void ftpDisconnect(FTPConnection *ftpObject) {
+    if (ftpObject) {
+        if (ftpObject->curl) {
+            curl_easy_cleanup(ftpObject->curl);
+        }
+        if (ftpObject->urlBase) {
+            free(ftpObject->urlBase);
+        }
+        free(ftpObject);
+    }
+}
+
+// Helper functions (keeping the same structure as original)
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, FTPResponse *response) {
     size_t realsize = size * nmemb;
     char *ptr = realloc(response->data, response->size + realsize + 1);
     if (!ptr) {
-        fprintf(stderr, "[-] Memory allocation failed in WriteCallback\n");
         return 0;
     }
     
     response->data = ptr;
     memcpy(&(response->data[response->size]), contents, realsize);
     response->size += realsize;
-    response->data[response->size] = 0; // null terminate
+    response->data[response->size] = 0;
     
     return realsize;
 }
 
-// Initialize FTP response structure
 static void initFTPResponse(FTPResponse *response) {
     response->data = malloc(1);
     response->size = 0;
@@ -46,7 +108,6 @@ static void initFTPResponse(FTPResponse *response) {
     }
 }
 
-// Free FTP response structure
 static void freeFTPResponse(FTPResponse *response) {
     if (response->data) {
         free(response->data);
@@ -55,295 +116,10 @@ static void freeFTPResponse(FTPResponse *response) {
     response->size = 0;
 }
 
-// Reset CURL to default state for FTP operations
 static void resetCurlState(CURL *curl) {
-    curl_easy_setopt(curl, CURLOPT_UPLOAD, 0L);
-    curl_easy_setopt(curl, CURLOPT_NOBODY, 0L);
-    curl_easy_setopt(curl, CURLOPT_READDATA, NULL);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, NULL);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
-    curl_easy_setopt(curl, CURLOPT_QUOTE, NULL);
-    curl_easy_setopt(curl, CURLOPT_POSTQUOTE, NULL);
-}
-
-// Create and return an FTP connected object
-FTPConnection *ftpConnect(const char *targetIP, int port, const char *username, const char *password) {
-    // Create the object used for FTP
-    FTPConnection *ftpObject = malloc(sizeof(FTPConnection));
-    if (!ftpObject) return NULL;
-
-    // Initialize all fields
-    ftpObject->curl = NULL;
-    ftpObject->urlBase = NULL;
-    ftpObject->username = NULL;
-    ftpObject->password = NULL;
-
-    // Create the curl object used for the connection
-    ftpObject->curl = curl_easy_init();
-    if (!ftpObject->curl) {
-        fprintf(stderr, "[-] Connection failed: curl_easy_init failed\n");
-        free(ftpObject);
-        return NULL;
+    if (curl) {
+        curl_easy_reset(curl);
     }
-
-    // Build the URL for the FTP connection - use dynamic allocation
-    size_t len = strlen(targetIP) + 50; // Extra space for protocol, port, etc.
-    ftpObject->urlBase = malloc(len);
-    if (!ftpObject->urlBase) {
-        fprintf(stderr, "[-] Memory allocation failed\n");
-        curl_easy_cleanup(ftpObject->curl);
-        free(ftpObject);
-        return NULL;
-    }
-    snprintf(ftpObject->urlBase, len, "ftp://%s:%d/", targetIP, port);
-
-    // Set the username and password
-    ftpObject->username = strdup(username);
-    ftpObject->password = strdup(password);
-    
-    if (!ftpObject->username || !ftpObject->password) {
-        fprintf(stderr, "[-] Memory allocation failed\n");
-        ftpDisconnect(ftpObject);
-        return NULL;
-    }
-
-    // Set the curl options
-    curl_easy_setopt(ftpObject->curl, CURLOPT_USERNAME, ftpObject->username);
-    curl_easy_setopt(ftpObject->curl, CURLOPT_PASSWORD, ftpObject->password);
-    curl_easy_setopt(ftpObject->curl, CURLOPT_TIMEOUT, 30L);
-    curl_easy_setopt(ftpObject->curl, CURLOPT_CONNECTTIMEOUT, 10L);
-
-    // Test the connection
-    curl_easy_setopt(ftpObject->curl, CURLOPT_URL, ftpObject->urlBase);
-    curl_easy_setopt(ftpObject->curl, CURLOPT_NOBODY, 1L); // HEAD request only
-    
-    CURLcode result = curl_easy_perform(ftpObject->curl);
-    if (result != CURLE_OK) {
-        fprintf(stderr, "[-] Authentication failed: %s\n", curl_easy_strerror(result));
-        ftpDisconnect(ftpObject);
-        return NULL;
-    }
-
-    // Reset state after connection test
-    resetCurlState(ftpObject->curl);
-
-    // Return connected object
-    return ftpObject;
-}
-
-// Upload a file using a connected object
-int ftpUploadFile(FTPConnection *ftpObject, const char *localPath, const char *remotePath) {
-    // Make sure that FTPConnection exists
-    if (!ftpObject || !ftpObject->curl || !localPath || !remotePath) {
-        fprintf(stderr, "[-] Invalid parameters\n");
-        return -1;
-    }
-
-    // Reset curl state first
-    resetCurlState(ftpObject->curl);
-
-    // Build full URL - use dynamic allocation
-    size_t urlLen = strlen(ftpObject->urlBase) + strlen(remotePath) + 1;
-    char *fullURL = malloc(urlLen);
-    if (!fullURL) {
-        fprintf(stderr, "[-] Memory allocation failed\n");
-        return -1;
-    }
-    snprintf(fullURL, urlLen, "%s%s", ftpObject->urlBase, remotePath);
-
-    // Open the local file
-    FILE *localFile = fopen(localPath, "rb");
-    if (!localFile) {
-        fprintf(stderr, "[-] fopen: Could not open local file %s\n", localPath);
-        free(fullURL);
-        return -1;
-    }
-
-    // Get file size
-    fseek(localFile, 0L, SEEK_END);
-    long fileSize = ftell(localFile);
-    fseek(localFile, 0L, SEEK_SET);
-
-    // Build the request
-    curl_easy_setopt(ftpObject->curl, CURLOPT_URL, fullURL);
-    curl_easy_setopt(ftpObject->curl, CURLOPT_UPLOAD, 1L);
-    curl_easy_setopt(ftpObject->curl, CURLOPT_READDATA, localFile);
-    curl_easy_setopt(ftpObject->curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)fileSize);
-
-    // Make the request
-    CURLcode result = curl_easy_perform(ftpObject->curl);
-    fclose(localFile);
-    free(fullURL);
-
-    if (result != CURLE_OK) {
-        fprintf(stderr, "[-] FTP upload failed: %s\n", curl_easy_strerror(result));
-        return -1;
-    }
-
-    printf("[+] Upload complete: %s\n", remotePath);
-    return 0;
-}
-
-// Download a file using a connected object
-int ftpDownloadFile(FTPConnection *ftpObject, const char *remotePath, const char *localPath) {
-    if (!ftpObject || !ftpObject->curl || !remotePath || !localPath) {
-        fprintf(stderr, "[-] Invalid parameters\n");
-        return -1;
-    }
-
-    // Reset curl state first
-    resetCurlState(ftpObject->curl);
-
-    // Build full URL - use dynamic allocation
-    size_t urlLen = strlen(ftpObject->urlBase) + strlen(remotePath) + 1;
-    char *fullURL = malloc(urlLen);
-    if (!fullURL) {
-        fprintf(stderr, "[-] Memory allocation failed\n");
-        return -1;
-    }
-    snprintf(fullURL, urlLen, "%s%s", ftpObject->urlBase, remotePath);
-
-    // Open local file for writing
-    FILE *localFile = fopen(localPath, "wb");
-    if (!localFile) {
-        fprintf(stderr, "[-] fopen: Could not create local file %s\n", localPath);
-        free(fullURL);
-        return -1;
-    }
-
-    // Setup curl for download
-    curl_easy_setopt(ftpObject->curl, CURLOPT_URL, fullURL);
-    curl_easy_setopt(ftpObject->curl, CURLOPT_WRITEDATA, localFile);
-
-    // Perform the download
-    CURLcode result = curl_easy_perform(ftpObject->curl);
-    fclose(localFile);
-    free(fullURL);
-
-    if (result != CURLE_OK) {
-        fprintf(stderr, "[-] FTP download failed: %s\n", curl_easy_strerror(result));
-        return -1;
-    }
-
-    printf("[+] Download complete: %s\n", localPath);
-    return 0;
-}
-
-// List directory contents
-int ftpListDirectory(FTPConnection *ftpObject, const char *remotePath) {
-    if (!ftpObject || !ftpObject->curl) {
-        fprintf(stderr, "[-] Invalid parameters\n");
-        return -1;
-    }
-
-    // Reset curl state first
-    resetCurlState(ftpObject->curl);
-
-    // Build full URL
-    size_t urlLen = strlen(ftpObject->urlBase) + (remotePath ? strlen(remotePath) : 0) + 1;
-    char *fullURL = malloc(urlLen);
-    if (!fullURL) {
-        fprintf(stderr, "[-] Memory allocation failed\n");
-        return -1;
-    }
-    
-    if (remotePath && strlen(remotePath) > 0) {
-        snprintf(fullURL, urlLen, "%s%s", ftpObject->urlBase, remotePath);
-    } else {
-        snprintf(fullURL, urlLen, "%s", ftpObject->urlBase);
-    }
-
-    // Setup response structure
-    FTPResponse response;
-    initFTPResponse(&response);
-
-    // Setup curl for directory listing
-    curl_easy_setopt(ftpObject->curl, CURLOPT_URL, fullURL);
-    curl_easy_setopt(ftpObject->curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-    curl_easy_setopt(ftpObject->curl, CURLOPT_WRITEDATA, &response);
-
-    // Perform the listing
-    CURLcode result = curl_easy_perform(ftpObject->curl);
-    free(fullURL);
-
-    if (result != CURLE_OK) {
-        fprintf(stderr, "[-] FTP list failed: %s\n", curl_easy_strerror(result));
-        freeFTPResponse(&response);
-        return -1;
-    }
-
-    // Print the directory listing
-    if (response.data && response.size > 0) {
-        printf("%s", response.data);
-    }
-
-    freeFTPResponse(&response);
-    return 0;
-}
-
-// Run an FTP command (like PWD, MKD, etc.)
-int ftpRunCommand(FTPConnection *ftpObject, const char *command) {
-    // Make sure that FTPConnection exists
-    if (!ftpObject || !ftpObject->curl || !command) {
-        fprintf(stderr, "[-] Invalid parameters\n");
-        return -1;
-    }
-
-    // Reset curl state first
-    resetCurlState(ftpObject->curl);
-
-    // Setup response structure for command output
-    FTPResponse response;
-    initFTPResponse(&response);
-
-    // Setup curl for the command
-    curl_easy_setopt(ftpObject->curl, CURLOPT_URL, ftpObject->urlBase);
-    curl_easy_setopt(ftpObject->curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-    curl_easy_setopt(ftpObject->curl, CURLOPT_WRITEDATA, &response);
-
-    // Add custom FTP command
-    struct curl_slist *commands = NULL;
-    commands = curl_slist_append(commands, command);
-    curl_easy_setopt(ftpObject->curl, CURLOPT_QUOTE, commands);
-
-    // Execute command
-    CURLcode result = curl_easy_perform(ftpObject->curl);
-    
-    // Clean up command list
-    curl_slist_free_all(commands);
-
-    if (result != CURLE_OK) {
-        fprintf(stderr, "[-] Failed to execute command '%s': %s\n", command, curl_easy_strerror(result));
-        freeFTPResponse(&response);
-        return -1;
-    }
-
-    // Print command output if any
-    if (response.data && response.size > 0) {
-        printf("%s", response.data);
-    }
-
-    freeFTPResponse(&response);
-    return 0;
-}
-
-// Clean up and disconnect
-void ftpDisconnect(FTPConnection *ftpObject) {
-    if (!ftpObject) return;
-    
-    if (ftpObject->curl) {
-        curl_easy_cleanup(ftpObject->curl);
-    }
-    if (ftpObject->urlBase) {
-        free(ftpObject->urlBase);
-    }
-    if (ftpObject->username) {
-        free(ftpObject->username);
-    }
-    if (ftpObject->password) {
-        free(ftpObject->password);
-    }
-    free(ftpObject);
 }
 
 #endif
