@@ -1,0 +1,10 @@
+anonymous
+admin
+user
+password
+kali
+root
+toor
+user1
+password123
+123
