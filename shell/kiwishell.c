@@ -46,6 +46,88 @@ void processCommand(char *commandString) {
 
         // Run the portscanner command
         system(cmd);
+        return;
+    }
+    // DNSFind tool
+    else if (strcmp(mainWord, "dnsfind") == 0) {
+        // Get next tokens
+        char *domain = strtok(NULL, " ");
+        char *wordlist = strtok(NULL, " ");
+
+        // Check if tokens are valid
+        if (!domain || !wordlist) {
+            printf("Usage: dnsfind <Domain> <Wordlist>\n");
+            return;
+        }
+
+        // Build command to run
+        char cmd[256];
+        snprintf(cmd, sizeof(cmd), "../recon/dnsfind/dnsfind %s %s", domain, wordlist);
+
+        // Run dnsfind
+        system(cmd);
+        return;
+    }
+    // Webfind tool
+    else if (strcmp(mainWord, "webfind") == 0) {
+        // Get tokens
+        char *targetURL = strtok(NULL, " ");
+        char *wordlist = strtok(NULL, " ");
+
+        // Check if tokens are valid
+        if (!targetURL || !wordlist) {
+            printf("Usage: webfind <URL> <Wordlist>\n");
+            return;
+        }
+
+        // Build the command
+        char cmd[256];
+        snprintf(cmd, sizeof(cmd), "../recon/webfind/webfind %s %s", targetURL, wordlist);
+
+        // Run the command
+        system(cmd);
+        return;
+    }
+    // Webdrop exploit
+    else if (strcmp(mainWord, "webdrop") == 0) {
+        // Get needed tokens
+        char *targetIP = strtok(NULL, " ");
+        char *localFile = strtok(NULL, " ");
+        char *username = strtok(NULL, " ");
+        char *password = strtok(NULL, " ");
+
+        // Check all tokens are valid
+        if (!targetIP || !localFile || !username || !password) {
+            printf("Usage: webdrop <IP> <Local file to upload> <FTP username> <FTP password>\n");
+            return;
+        }
+
+        // Build the command
+        char cmd[256];
+        snprintf(cmd, sizeof(cmd), "python3 ../exploit/webdrop/webdrop.py %s %s %s %s\n", targetIP, localFile, username, password);
+
+        // Run the command
+        system(cmd);
+        return;
+    }
+    // Packer exploit scripts
+    else if (strcmp(mainWord, "packer") == 0) {
+        // Get needed token
+        char *packerScript = strtok(NULL, " ");
+
+        // Check if token is valid
+        if (!packerScript) {
+            printf("Usage: packer <Packer script>\n");
+            return;
+        }
+
+        // Build the command
+        char cmd[256];
+        snprintf(cmd, sizeof(cmd), "../exploit/packer/packer %s", packerScript);
+
+        // Run the command
+        system(cmd);
+        return;
     }
     else {
         printf("Unknown command: %s\n", mainWord);
