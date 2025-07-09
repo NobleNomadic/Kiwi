@@ -1,6 +1,0 @@
-anonymous
-user
-admin
-root
-test
-guest
