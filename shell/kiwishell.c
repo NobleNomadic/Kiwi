@@ -256,7 +256,19 @@ void mainCommandLoop() {
 }
 
 // Entry point
-int main() {
+int main(int argc, char *argv[]) {
+  // Check if any command line arguments where used
+  if (argc >= 2 &&
+      (strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0)) {
+    printf("Kiwi shell 1.1\n");
+    return 0;
+  } else if (argc >= 2 &&
+             (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0)) {
+    printf("Launch kiwi: ./kiwishell\nCompile all tools: bash "
+           "build.sh\nDocumentation for each tool in README\n");
+    return 0;
+  }
+
   homeFunction();    // Print banner and commands list
   mainCommandLoop(); // Start the main command loop
   return 0;
