@@ -7,6 +7,7 @@ Please do not use anything here malicously.
 Install kiwi by cloning this repository. Each tool is inside its own folder, which will be found the recon, exploit, payload or utility folder.
 Each tools folder will have the C source code, and a compiled binary file for that tool.
 The lib folder will contain all the wrappers needed for automating things like TCP connections, and DNS lookups.
+To ensure you have the latest compiled versions of all tools, run the `build.sh` script
 
 ## Tools
 - Recon
@@ -33,7 +34,11 @@ These are a collection of headers contain function definitions and implementatio
 - socketlib: Automate making connections, and sending data over sockets
 - dnslib: DNS lookup and reverse lookup
 
-## Using Kiwi
+## Kiwi Shell
+In the shell folder, you can execute the `kiwishell` file to use a multitool that can run other tools.
+If you don't want to navigate to individual folders to use each tool, use this.
+
+## Using Kiwi Tools
 ### Portscanner
 Usage: ./portscanner [IP] [Scan File]
 IP: The target IP address that you want to scan
@@ -53,7 +58,7 @@ Example:
 ```bash
 ./portscanner 127.0.0.1 basic
 ```
-"basic" scanfile:
+basic file containing flag for regular logging (1):
 ```scanfile
 1
 21
